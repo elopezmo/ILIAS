@@ -343,6 +343,36 @@ class ilObjLearningSequence extends ilContainer
         return $this->getLSParticipants();
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function cloneDependencies($a_target_id, $a_copy_id)
+    {
+        parent::cloneDependencies($a_target_id, $a_copy_id);
+
+        $lsItems = $this->getLSItems();
+        include_once './Services/Object/classes/class.ilObjectFactory.php';
+        $factory = new ilObjectFactory();
+        /** @var self $new_obj */
+        $new_obj = $factory->getInstanceByRefId($a_target_id, false);
+        $new_lsItems = $new_obj->getLSItems();
+        $corrected_new_lsItems = [];
+        /** @var LSItem $new_lsItem */
+        foreach ($new_lsItems as $position => $new_lsItem) {
+            /** @var LSItem $original_lsItem */
+            $original_lsItem = $lsItems[$position];
+            $corrected_new_lsItems[] = $new_lsItem
+                ->withOnline($original_lsItem->isOnline())
+                ->withOrderNumber($original_lsItem->getOrderNumber())
+                ->withPostCondition(new ilLSPostCondition(
+                    $new_lsItem->getRefId(),
+                    $original_lsItem->getPostCondition()->getConditionOperator(),
+                    $original_lsItem->getPostCondition()->getValue()
+                ));
+        }
+        $new_obj->storeLSItems($corrected_new_lsItems);
+    }
+
     public function getLSAccess() : ilObjLearningSequenceAccess
     {
         if (is_null($this->ls_access)) {
