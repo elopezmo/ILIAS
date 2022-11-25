@@ -668,6 +668,28 @@ class ilCalendarSettings
     }
 
     /**
+     * returns the date format string corresponding to the int constant date format value
+     * @param int $dateFormat
+     * @return string
+     */
+    public static function getDateFormatString(int $dateFormat): string
+    {
+        switch ($dateFormat) {
+            case ilCalendarSettings::DATE_FORMAT_DMY:
+                $formatString = 'd.m.Y';
+                break;
+            case ilCalendarSettings::DATE_FORMAT_MDY:
+                $formatString = 'm/d/Y';
+                break;
+            case ilCalendarSettings::DATE_FORMAT_YMD:
+            default:
+                $formatString = 'Y-m-d';
+                break;
+        }
+        return $formatString;
+    }
+
+    /**
      * Read settings
      *
      * @access private

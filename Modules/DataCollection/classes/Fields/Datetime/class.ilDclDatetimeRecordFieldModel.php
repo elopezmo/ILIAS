@@ -12,6 +12,17 @@
  */
 class ilDclDatetimeRecordFieldModel extends ilDclBaseRecordFieldModel
 {
+    protected string $date_format;
+
+    public function __construct(ilDclBaseRecordModel $record, ilDclBaseFieldModel $field)
+    {
+        parent::__construct($record, $field);
+        $this->date_format = ilCalendarSettings::getDateFormatString(
+            ilCalendarUserSettings::_getInstanceByUserId($this->user->getId())->getDateFormat()
+        );
+
+    }
+
     public function parseValue($value)
     {
         return $value;
@@ -32,7 +43,7 @@ class ilDclDatetimeRecordFieldModel extends ilDclBaseRecordFieldModel
 
 
     /**
-     * Function to parse incoming data from form input value $value. returns the string/number/etc. to store in the database.
+     * Function to parse incoming data from form input value $value. returns the string/number/etc. to export.
      *
      * @param mixed $value
      *
@@ -40,7 +51,7 @@ class ilDclDatetimeRecordFieldModel extends ilDclBaseRecordFieldModel
      */
     public function parseExportValue($value)
     {
-        return substr($value, 0, 10);
+        return date_create($value)->format($this->date_format);
     }
 
 
